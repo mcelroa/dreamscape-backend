@@ -1,10 +1,10 @@
 const mongoose = require("mongoose")
-const { ObjectID } = mongoose.Schema;
+const { ObjectId } = mongoose.Schema;
 
 const dreamSchema = new mongoose.Schema(
     {
         user: {
-            type: ObjectID,
+            type: ObjectId,
             ref: "User",
             required: true
         },

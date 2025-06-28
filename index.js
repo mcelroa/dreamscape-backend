@@ -14,13 +14,15 @@ mongoose
 
 // import routes
 const authRoutes = require("./routes/auth");
+const dreamRoutes = require("./routes/dreams");
 
 // middleware
 app.use(cors())
 app.use(express.json())
 
 // use routes middleware
-app.use("/api", authRoutes)
+app.use("/api", authRoutes);
+app.use("/api", dreamRoutes);
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`)

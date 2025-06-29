@@ -11,7 +11,7 @@ exports.dreamById = (req, res, next, id) => {
         .catch((e) => {
             console.error("Error getting dream: ", e)
             return res.status(400).json({
-                err: 'Dream not found'
+                err: 'Error getting dream'
             })
         })
 };

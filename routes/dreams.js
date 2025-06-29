@@ -13,7 +13,7 @@ const { verifyToken } = require("../middleware/auth")
 
 router.param("dreamId", dreamById)
 
-router.get("/dreams", getAll);
+router.get("/dreams", verifyToken, getAll);
 router.get("/dreams/:dreamId", verifyToken, getById);
 
 router.post("/dreams", verifyToken, create);

@@ -1,4 +1,6 @@
 const Dream = require("../models/Dream")
+const openai = require("../utils/openaiClient");
+const generateDreamPrompt = require("../utils/generateDreamPrompt");
 
 // getAll
 exports.getAll = async (req, res) => {
@@ -84,3 +86,74 @@ exports.remove = async (req, res) => {
 
     }
 }
+
+// interpretDream
+exports.interpretDream = async (req, res) => {
+    try {
+        const dream = req.dream;
+
+        if (dream.user.toString() !== req.userId) {
+            return res.status(403).json({ error: "Not authorized" });
+        }
+
+        // Skip if already interpreted
+        if (dream.interpretation) {
+            return res.json({ interpretation: dream.interpretation });
+        }
+
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4",
+            messages: [
+                { role: "system", content: "You are an expert dream interpreter." },
+                { role: "user", content: `Interpret this dream:\n\n${dream.content}` }
+            ]
+        });
+
+        const interpretation = completion.choices[0].message.content;
+        dream.interpretation = interpretation;
+        await dream.save();
+
+        res.json({ interpretation });
+    } catch (e) {
+        console.error("OpenAI error:", e);
+        res.status(500).json({ error: "Failed to interpret dream" });
+    }
+}
+
+exports.generateDreamImage = async (req, res) => {
+    try {
+        const dream = req.dream;
+
+        if (dream.user.toString() !== req.userId) {
+            return res.status(403).json({ error: "Not authorized" });
+        }
+
+        // Optional: skip if image already exists
+        if (dream.imageUrl) {
+            return res.json({ imageUrl: dream.imageUrl });
+        }
+
+        // Generate an image prompt based on the dream content
+        const prompt = generateDreamPrompt(dream.content);
+
+        // Call OpenAI DALL·E
+        const response = await openai.images.generate({
+            model: "dall-e-3", // or "dall-e-2" if you're on a cheaper plan
+            prompt: prompt,
+            n: 1,
+            size: "1024x1024"
+        });
+
+        const imageUrl = response.data[0].url;
+
+        // Save it to the dream
+        dream.imageUrl = imageUrl;
+        await dream.save();
+
+        res.json({ imageUrl });
+
+    } catch (err) {
+        console.error("Image generation error:", err);
+        res.status(500).json({ error: "Failed to generate dream image" });
+    }
+};

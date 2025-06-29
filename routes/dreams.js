@@ -6,7 +6,9 @@ const {
     getById,
     create,
     update,
-    remove
+    remove,
+    interpretDream,
+    generateDreamImage
 } = require("../controllers/dreams");
 const { dreamById } = require("../middleware/dreams");
 const { verifyToken } = require("../middleware/auth")
@@ -17,6 +19,9 @@ router.get("/dreams", verifyToken, getAll);
 router.get("/dreams/:dreamId", verifyToken, getById);
 
 router.post("/dreams", verifyToken, create);
+router.post("/dreams/:dreamId/interpret", verifyToken, interpretDream);
+router.post("/dreams/:dreamId/image", verifyToken, generateDreamImage);
+
 
 router.put("/dreams/:dreamId", verifyToken, update);
 

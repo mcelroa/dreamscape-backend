@@ -22,11 +22,9 @@ const dreamSchema = new mongoose.Schema(
             type: String,
             trim: true,
         },
-        generated_image: {
-            data: Buffer,
-            contentType: String
+        imageUrl: {
+            type: String
         }
-
     },
     { timestamps: true }
 )
